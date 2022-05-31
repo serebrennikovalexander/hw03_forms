@@ -1,4 +1,3 @@
-from django.conf import settings  # не используется, но есть в теории
 from django.contrib import admin
 from django.urls import include, path
 
