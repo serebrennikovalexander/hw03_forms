@@ -1,4 +1,3 @@
-<!-- tamplates/posts/index.html-->
 {% extends 'base.html' %}
 {% block title%}
   Последние обновления на сайте
@@ -23,7 +22,6 @@
       <a href="{% url 'posts:group_list' post.group.slug %}">все записи группы {{ post.group.title }}</a>
     {% endif %}
     {% if not forloop.last %}<hr>{% endif %}
-    <!-- под последним постом нет линии -->
   {% endfor %}
   {% include 'posts/includes/paginator.html' %}      
 {% endblock %}

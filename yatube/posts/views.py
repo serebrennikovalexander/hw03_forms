@@ -10,7 +10,6 @@ NUMBER_OF_POSTS = settings.NUMBER_OF_POSTS
 NUMBER_OF_CHARACTERS = settings.NUMBER_OF_CHARACTERS
 
 
-# Главная страница
 def index(request):
     posts = Post.objects.select_related('author').all()
     paginator = Paginator(posts, NUMBER_OF_POSTS)
@@ -56,7 +55,7 @@ def profile(request, username):
 
 
 def post_detail(request, post_id):
-    post = Post.objects.select_related('author', 'group').get(pk=post_id)
+    post = get_object_or_404(Post, pk=post_id)
     number_of_posts = post.author.posts.count()
     title = post.text[:NUMBER_OF_CHARACTERS]
     template = 'posts/post_detail.html'
@@ -71,17 +70,13 @@ def post_detail(request, post_id):
 @login_required
 def post_create(request):
     template = 'posts/create_post.html'
-    if request.method == 'POST':
-        form = PostForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.save()
-            return redirect('posts:profile', post.author.username)
+    form = PostForm(request.POST or None)
+    if form.is_valid():
+        post = form.save(commit=False)
+        post.author = request.user
+        post.save()
+        return redirect('posts:profile', post.author.username)
 
-        return render(request, template, {'form': form})
-
-    form = PostForm()
     return render(request, template, {'form': form})
 
 
@@ -89,15 +84,13 @@ def post_create(request):
 def post_edit(request, post_id):
     is_edit = True
     template = 'posts/create_post.html'
-    post = Post.objects.select_related('author', 'group').get(pk=post_id)
+    post = get_object_or_404(Post, pk=post_id)
     if post.author == request.user:
-        if request.method == 'POST':
-            form = PostForm(request.POST, instance=post)
-            if form.is_valid():
-                form.save()
-                return redirect('posts:post_detail', post_id)
+        form = PostForm(request.POST or None, instance=post)
+        if form.is_valid():
+            form.save()
+            return redirect('posts:post_detail', post_id)
 
-        form = PostForm(instance=post)
         context = {
             'form': form,
             'post': post,
